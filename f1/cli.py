@@ -1,6 +1,8 @@
 """F1 CLI - View Formula 1 season schedules powered by Fast-F1."""
 
-from datetime import datetime, timezone
+import sys
+from datetime import timezone
+from zoneinfo import ZoneInfo
 
 import click
 import fastf1
@@ -40,8 +42,7 @@ def season(year: int, include_testing: bool):
     if not include_testing:
         schedule = schedule[~schedule.is_testing()]
 
-    local_tz = datetime.now(timezone.utc).astimezone().tzinfo
-    tz_name = datetime.now(timezone.utc).astimezone().strftime("%Z")
+    local_tz = _get_local_timezone()
 
     # Pre-compute all rows so we can size columns to fit the data.
     rows = []
@@ -55,7 +56,7 @@ def season(year: int, include_testing: bool):
             )
         )
 
-    date_header = f"Date & Time ({tz_name})"
+    date_header = "Date & Time"
     col_rnd = max(len("Rnd"), max(len(r[0]) for r in rows)) + 2
     col_evt = max(len("Event"), max(len(r[1]) for r in rows)) + 2
     col_loc = max(len("Location"), max(len(r[2]) for r in rows)) + 2
@@ -83,16 +84,20 @@ def _format_location(event: pd.Series) -> str:
     return location or country or "TBC"
 
 
-def _format_race_datetime(event: pd.Series, local_tz) -> str:
-    """Extract and format the race session date/time in the local timezone."""
-    # The race is always Session5 in the schedule
+def _format_race_datetime(event: pd.Series, local_tz: ZoneInfo) -> str:
+    """Extract and format the race session date/time in the local timezone.
+
+    The timezone abbreviation shown reflects the offset in effect on the race
+    date, so DST transitions are handled correctly (e.g. GMT vs BST).
+    """
     for session_num in range(1, 6):
         if event.get(f"Session{session_num}") == "Race":
             date_utc = event.get(f"Session{session_num}DateUtc")
             if pd.notna(date_utc):
                 utc_dt = date_utc.to_pydatetime().replace(tzinfo=timezone.utc)
                 local_dt = utc_dt.astimezone(local_tz)
-                return local_dt.strftime("%Y-%m-%d  %H:%M")
+                tz_abbr = local_dt.strftime("%Z")
+                return f"{local_dt.strftime('%Y-%m-%d  %H:%M')} {tz_abbr}"
             break
 
     # Fallback to EventDate
@@ -101,3 +106,46 @@ def _format_race_datetime(event: pd.Series, local_tz) -> str:
         return str(event_date.strftime("%Y-%m-%d"))
 
     return "TBC"
+
+
+def _get_local_timezone() -> ZoneInfo:
+    """Detect the system's IANA timezone for DST-aware conversions.
+
+    Falls back to UTC if the local timezone cannot be determined.
+    """
+    if sys.platform == "win32":
+        # On Windows, try tzdata via datetime
+        try:
+            import winreg
+
+            key = winreg.OpenKey(
+                winreg.HKEY_LOCAL_MACHINE,
+                r"SYSTEM\CurrentControlSet\Control\TimeZoneInformation",
+            )
+            tz_keyname, _ = winreg.QueryValueEx(key, "TimeZoneKeyName")
+            return ZoneInfo(tz_keyname)
+        except Exception:
+            return ZoneInfo("UTC")
+
+    # On Unix-like systems, read /etc/localtime symlink or TZ env var
+    import os
+
+    tz_env = os.environ.get("TZ")
+    if tz_env:
+        # Handle TZ values like ":Europe/London" (leading colon)
+        tz_env = tz_env.lstrip(":")
+        try:
+            return ZoneInfo(tz_env)
+        except Exception:
+            pass
+
+    try:
+        link = os.readlink("/etc/localtime")
+        # Typical path: /usr/share/zoneinfo/Europe/London
+        if "zoneinfo/" in link:
+            tz_key = link.split("zoneinfo/", 1)[1]
+            return ZoneInfo(tz_key)
+    except (OSError, IndexError):
+        pass
+
+    return ZoneInfo("UTC")
