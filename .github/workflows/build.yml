@@ -1,8 +1,8 @@
 name: Quality checks
 
 on:
-  pull_request:
-    branches: [main]
+  push:
+    branches: ["**"]
 
 permissions: write-all
 
