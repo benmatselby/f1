@@ -58,7 +58,7 @@ def season(year: int, include_testing: bool, show_winners: bool):
                 str(event["RoundNumber"]),
                 event["EventName"],
                 _format_location(event),
-                _format_race_datetime(event),
+                helpers.format_race_datetime(event),
             ]
 
             race_time = helpers.get_race_utc(event)
@@ -144,10 +144,3 @@ def _format_location(event: pd.Series) -> str:
         return f"{location}, {country}"
 
     return location or country or "TBC"
-
-
-def _format_race_datetime(event: pd.Series) -> str:
-    """Extract and format the race session date/time in the local timezone."""
-
-    race_time = helpers.get_race_utc(event)
-    return race_time.strftime("%Y-%m-%d  %H:%M") if race_time else "TBC"

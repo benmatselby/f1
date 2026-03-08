@@ -14,3 +14,13 @@ def get_race_utc(event: pd.Series) -> datetime | None:
             return None
 
     return None
+
+
+def format_race_datetime(event: pd.Series) -> str:
+    """Extract and format the race session date/time in the local timezone."""
+    race_time = get_race_utc(event)
+    if not race_time:
+        return "TBC"
+
+    local_dt = race_time.astimezone()
+    return local_dt.strftime("%Y-%m-%d  %H:%M %Z")
