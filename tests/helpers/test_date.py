@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 import pandas as pd
 
-from f1.helpers.helpers import get_race_utc
+from f1.helpers import date as date_helpers
 
 
 class TestGetRaceUtc:
@@ -25,7 +25,7 @@ class TestGetRaceUtc:
                 "Session5DateUtc": pd.Timestamp("2026-03-17 15:00:00"),
             }
         )
-        result = get_race_utc(event)
+        result = date_helpers.get_race_utc(event)
         assert result == datetime(2026, 3, 17, 15, 0, 0, tzinfo=timezone.utc)
 
     def test_returns_timezone_aware_datetime(self):
@@ -35,7 +35,7 @@ class TestGetRaceUtc:
                 "Session1DateUtc": pd.Timestamp("2026-07-05 14:00:00"),
             }
         )
-        result = get_race_utc(event)
+        result = date_helpers.get_race_utc(event)
         assert result is not None
         assert result.tzinfo == timezone.utc
 
@@ -48,7 +48,7 @@ class TestGetRaceUtc:
                 "Session2DateUtc": pd.Timestamp("2026-03-15 15:00:00"),
             }
         )
-        result = get_race_utc(event)
+        result = date_helpers.get_race_utc(event)
         assert result is None
 
     def test_returns_none_when_race_date_is_nat(self):
@@ -58,7 +58,7 @@ class TestGetRaceUtc:
                 "Session1DateUtc": pd.NaT,
             }
         )
-        result = get_race_utc(event)
+        result = date_helpers.get_race_utc(event)
         assert result is None
 
     def test_finds_race_in_any_session_slot(self):
@@ -68,10 +68,10 @@ class TestGetRaceUtc:
                 data[f"Session{n}"] = "Race" if n == slot else f"Session {n}"
                 data[f"Session{n}DateUtc"] = pd.Timestamp("2026-06-01 14:00:00")
             event = pd.Series(data)
-            result = get_race_utc(event)
+            result = date_helpers.get_race_utc(event)
             assert result is not None, f"Race not found in Session{slot}"
 
     def test_returns_none_for_empty_series(self):
         event = pd.Series(dtype=object)
-        result = get_race_utc(event)
+        result = date_helpers.get_race_utc(event)
         assert result is None

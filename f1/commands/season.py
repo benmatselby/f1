@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 import click
 import fastf1
 import pandas as pd
-from f1.helpers import helpers
+from f1.helpers import date as date_helpers
 
 
 @click.command()
@@ -55,10 +55,10 @@ def season(year: int, include_testing: bool, show_winners: bool):
                 str(event["RoundNumber"]),
                 event["EventName"],
                 _format_location(event),
-                helpers.format_race_datetime(event),
+                date_helpers.format_race_datetime(event),
             ]
 
-            race_time = helpers.get_race_utc(event)
+            race_time = date_helpers.get_race_utc(event)
             if race_time and race_time < now:
                 completed += 1
 
@@ -101,7 +101,7 @@ def season(year: int, include_testing: bool, show_winners: bool):
 
 def _get_race_winner(now: datetime, year: int, event: pd.Series) -> str:
     """Return the full name of the race winner, or empty if not yet raced."""
-    race_time = helpers.get_race_utc(event)
+    race_time = date_helpers.get_race_utc(event)
     if race_time and race_time >= now:
         return ""
 
