@@ -241,11 +241,11 @@ source = { editable = "." }
 dependencies = [
     { name = "click" },
     { name = "fastf1" },
-    { name = "pre-commit" },
 ]
 
 [package.dev-dependencies]
 dev = [
+    { name = "pre-commit" },
     { name = "pytest" },
     { name = "ruff" },
 ]
@@ -254,11 +254,11 @@ dev = [
 requires-dist = [
     { name = "click", specifier = ">=8.1" },
     { name = "fastf1", specifier = ">=3.6" },
-    { name = "pre-commit", specifier = ">=4.5.1" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "pre-commit", specifier = ">=4.5.1" },
     { name = "pytest", specifier = ">=9.0.2" },
     { name = "ruff", specifier = ">=0.15.5" },
 ]
