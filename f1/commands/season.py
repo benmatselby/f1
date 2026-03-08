@@ -17,7 +17,7 @@ from f1.helpers import date as date_helpers
     help="Include pre-season testing events.",
 )
 @click.option(
-    "--show-winners", is_flag=True, default=False, help="Show the face winners"
+    "--show-winners", is_flag=True, default=False, help="Show the race winners"
 )
 def season(year: int, include_testing: bool, show_winners: bool):
     """Show all races in a given F1 season.
