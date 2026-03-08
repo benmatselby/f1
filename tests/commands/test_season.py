@@ -1,6 +1,8 @@
 """Tests for the season command helpers."""
 
-from f1.commands.season import _progress_bar
+import pandas as pd
+
+from f1.commands.season import _format_location, _progress_bar
 
 
 class TestProgressBar:
@@ -45,3 +47,35 @@ class TestProgressBar:
     def test_single_race_season_not_completed(self):
         result = _progress_bar(0, 1)
         assert result == "[------------------------------] 0/1 (0%)"
+
+
+class TestFormatLocation:
+    """Tests for _format_location."""
+
+    def test_location_and_country(self):
+        event = pd.Series({"Location": "Silverstone", "Country": "United Kingdom"})
+        assert _format_location(event) == "Silverstone, United Kingdom"
+
+    def test_location_only(self):
+        event = pd.Series({"Location": "Monaco", "Country": ""})
+        assert _format_location(event) == "Monaco"
+
+    def test_country_only(self):
+        event = pd.Series({"Location": "", "Country": "Italy"})
+        assert _format_location(event) == "Italy"
+
+    def test_neither_location_nor_country(self):
+        event = pd.Series({"Location": "", "Country": ""})
+        assert _format_location(event) == "TBC"
+
+    def test_missing_both_keys(self):
+        event = pd.Series({"EventName": "Test GP"})
+        assert _format_location(event) == "TBC"
+
+    def test_missing_location_key(self):
+        event = pd.Series({"Country": "Australia"})
+        assert _format_location(event) == "Australia"
+
+    def test_missing_country_key(self):
+        event = pd.Series({"Location": "Melbourne"})
+        assert _format_location(event) == "Melbourne"
