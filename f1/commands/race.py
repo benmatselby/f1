@@ -59,6 +59,7 @@ def race(year: int, venue: str):
     for i, header in enumerate(headers):
         max_data = max((len(r[i]) for r in rows), default=0)
         col_widths.append(max(len(header), max_data) + 2)
+
     # Last column doesn't need trailing padding
     col_widths[-1] = max(len(headers[-1]), max(len(r[-1]) for r in rows))
 
@@ -79,8 +80,10 @@ def _fmt_position(position, classified_position) -> str:
     """Format the finishing position."""
     if pd.notna(position):
         return str(int(position))
+
     if classified_position and str(classified_position) not in ("nan", ""):
         return str(classified_position)
+
     return "-"
 
 
@@ -90,7 +93,9 @@ def _fmt_grid(grid_position) -> str:
         pos = int(grid_position)
         if pos < 0:
             return "-"
+
         return "PIT" if pos == 0 else str(pos)
+
     return "-"
 
 
@@ -110,17 +115,20 @@ def _fmt_time(driver: pd.Series, is_leader: bool) -> str:
             millis = t.microseconds // 1000
             if hours:
                 return f"{hours}:{minutes:02d}:{seconds:02d}.{millis:03d}"
+
             return f"{minutes}:{seconds:02d}.{millis:03d}"
         else:
             gap_secs = t.total_seconds()
             if gap_secs < 60:
                 return f"+{gap_secs:.3f}s"
+
             minutes, secs = divmod(gap_secs, 60)
             return f"+{int(minutes)}:{secs:06.3f}"
 
     status = driver.get("Status", "")
     if status and "Lap" in str(status):
         return str(status)
+
     return ""
 
 
