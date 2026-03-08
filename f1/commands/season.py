@@ -43,16 +43,21 @@ def season(year: int, include_testing: bool, show_winners: bool):
 
     # Pre-compute all rows so we can size columns to fit the data.
     rows = []
-    for _, event in schedule.iterrows():
-        row = [
-            str(event["RoundNumber"]),
-            event["EventName"],
-            _format_location(event),
-            _format_race_datetime(event, local_tz),
-        ]
-        if show_winners:
-            row.append(_get_race_winner(year, event))
-        rows.append(tuple(row))
+
+    events = list(schedule.iterrows())
+    with click.progressbar(
+        events, length=len(events), label="Getting race details"
+    ) as bar:
+        for _, event in bar:
+            row = [
+                str(event["RoundNumber"]),
+                event["EventName"],
+                _format_location(event),
+                _format_race_datetime(event, local_tz),
+            ]
+            if show_winners:
+                row.append(_get_race_winner(year, event))
+            rows.append(tuple(row))
 
     columns = [
         ("Rnd", 0),
