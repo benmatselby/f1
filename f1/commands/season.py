@@ -1,7 +1,7 @@
 """Show all races in a given F1 season."""
 
 import sys
-from datetime import timezone
+from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
 import click
@@ -47,6 +47,7 @@ def season(year: int, include_testing: bool):
                 event["EventName"],
                 _format_location(event),
                 _format_race_datetime(event, local_tz),
+                _get_race_winner(year, event),
             )
         )
 
@@ -54,19 +55,78 @@ def season(year: int, include_testing: bool):
     col_rnd = max(len("Rnd"), max(len(r[0]) for r in rows)) + 2
     col_evt = max(len("Event"), max(len(r[1]) for r in rows)) + 2
     col_loc = max(len("Location"), max(len(r[2]) for r in rows)) + 2
-    col_dt = max(len(date_header), max(len(r[3]) for r in rows))
-    total = col_rnd + col_evt + col_loc + col_dt
+    col_dt = max(len(date_header), max(len(r[3]) for r in rows)) + 2
+    col_win = max(len("Winner"), max(len(r[4]) for r in rows))
+    total = col_rnd + col_evt + col_loc + col_dt + col_win
 
     click.echo(f"\nFormula 1 {year} Season\n")
     click.echo(
-        f"{'Rnd':<{col_rnd}}{'Event':<{col_evt}}{'Location':<{col_loc}}{date_header}"
+        f"{'Rnd':<{col_rnd}}{'Event':<{col_evt}}{'Location':<{col_loc}}"
+        f"{date_header:<{col_dt}}{'Winner'}"
     )
     click.echo("-" * total)
 
-    for rnd, name, location, race_date in rows:
-        click.echo(f"{rnd:<{col_rnd}}{name:<{col_evt}}{location:<{col_loc}}{race_date}")
+    for rnd, name, location, race_date, winner in rows:
+        click.echo(
+            f"{rnd:<{col_rnd}}{name:<{col_evt}}{location:<{col_loc}}"
+            f"{race_date:<{col_dt}}{winner}"
+        )
 
-    click.echo(f"\nTotal events: {len(rows)}")
+    completed = _count_completed(schedule)
+    click.echo(f"\nProgress    : {_progress_bar(completed, len(rows))}")
+    click.echo(f"Total events: {len(rows)}")
+
+
+def _get_race_winner(year: int, event: pd.Series) -> str:
+    """Return the full name of the race winner, or empty if not yet raced."""
+    now = datetime.now(timezone.utc)
+    for session_num in range(1, 6):
+        if event.get(f"Session{session_num}") == "Race":
+            date_utc = event.get(f"Session{session_num}DateUtc")
+            if pd.notna(date_utc):
+                race_dt = date_utc.to_pydatetime().replace(tzinfo=timezone.utc)
+                if race_dt >= now:
+                    return ""
+            break
+
+    try:
+        session = fastf1.get_session(year, event["RoundNumber"], "R")
+        session.load(laps=False, telemetry=False, weather=False, messages=False)
+        results = session.results
+        if results.empty:
+            return ""
+        winner = results[results["Position"] == 1.0]
+        if winner.empty:
+            return ""
+        return str(winner.iloc[0]["FullName"] or winner.iloc[0]["Abbreviation"] or "")
+    except Exception:
+        return ""
+
+
+def _count_completed(schedule) -> int:
+    """Count events whose race session is in the past."""
+    now = datetime.now(timezone.utc)
+    completed = 0
+    for _, event in schedule.iterrows():
+        for session_num in range(1, 6):
+            if event.get(f"Session{session_num}") == "Race":
+                date_utc = event.get(f"Session{session_num}DateUtc")
+                if pd.notna(date_utc):
+                    race_dt = date_utc.to_pydatetime().replace(tzinfo=timezone.utc)
+                    if race_dt < now:
+                        completed += 1
+                break
+    return completed
+
+
+def _progress_bar(completed: int, total: int, width: int = 30) -> str:
+    """Build an ASCII progress bar showing season completion."""
+    if total == 0:
+        return ""
+    filled = round(width * completed / total)
+    bar = "#" * filled + "-" * (width - filled)
+    pct = 100 * completed / total
+    return f"[{bar}] {completed}/{total} ({pct:.0f}%)"
 
 
 def _format_location(event: pd.Series) -> str:
