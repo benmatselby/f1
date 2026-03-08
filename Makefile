@@ -29,7 +29,7 @@ install: ## Install and run the dependencies
 ##
 .PHONY: lint
 lint: ## Lint the code with Ruff
-	uv run ruff check -v
+	uv run ruff check
 
 .PHONY: lint-fix
 lint-fix: ## Lint the code with Ruff and fix
