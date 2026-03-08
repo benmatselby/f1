@@ -17,7 +17,10 @@ import pandas as pd
     default=False,
     help="Include pre-season testing events.",
 )
-def season(year: int, include_testing: bool):
+@click.option(
+    "--show-winners", is_flag=True, default=False, help="Show the face winners"
+)
+def season(year: int, include_testing: bool, show_winners: bool):
     """Show all races in a given F1 season.
 
     Displays the race name, location, and date/time for each event.
@@ -41,36 +44,43 @@ def season(year: int, include_testing: bool):
     # Pre-compute all rows so we can size columns to fit the data.
     rows = []
     for _, event in schedule.iterrows():
-        rows.append(
-            (
-                str(event["RoundNumber"]),
-                event["EventName"],
-                _format_location(event),
-                _format_race_datetime(event, local_tz),
-                _get_race_winner(year, event),
-            )
-        )
+        row = [
+            str(event["RoundNumber"]),
+            event["EventName"],
+            _format_location(event),
+            _format_race_datetime(event, local_tz),
+        ]
+        if show_winners:
+            row.append(_get_race_winner(year, event))
+        rows.append(tuple(row))
 
-    date_header = "Date & Time"
-    col_rnd = max(len("Rnd"), max(len(r[0]) for r in rows)) + 2
-    col_evt = max(len("Event"), max(len(r[1]) for r in rows)) + 2
-    col_loc = max(len("Location"), max(len(r[2]) for r in rows)) + 2
-    col_dt = max(len(date_header), max(len(r[3]) for r in rows)) + 2
-    col_win = max(len("Winner"), max(len(r[4]) for r in rows))
-    total = col_rnd + col_evt + col_loc + col_dt + col_win
+    columns = [
+        ("Rnd", 0),
+        ("Event", 1),
+        ("Location", 2),
+        ("Date & Time", 3),
+    ]
+    if show_winners:
+        columns.append(("Winner", 4))
+
+    col_widths = [
+        max(len(header), max(len(str(row[idx])) for row in rows)) + 2
+        for header, idx in columns
+    ]
+    total = sum(col_widths)
 
     click.echo(f"\nFormula 1 {year} Season\n")
-    click.echo(
-        f"{'Rnd':<{col_rnd}}{'Event':<{col_evt}}{'Location':<{col_loc}}"
-        f"{date_header:<{col_dt}}{'Winner'}"
+    header_row = "".join(
+        f"{header:<{width}}" for (header, _), width in zip(columns, col_widths)
     )
+    click.echo(header_row)
     click.echo("-" * total)
 
-    for rnd, name, location, race_date, winner in rows:
-        click.echo(
-            f"{rnd:<{col_rnd}}{name:<{col_evt}}{location:<{col_loc}}"
-            f"{race_date:<{col_dt}}{winner}"
+    for race in rows:
+        row_str = "".join(
+            f"{str(race[idx]):<{width}}" for (_, idx), width in zip(columns, col_widths)
         )
+        click.echo(row_str)
 
     completed = _count_completed(schedule)
     click.echo(f"\nProgress    : {_progress_bar(completed, len(rows))}")
