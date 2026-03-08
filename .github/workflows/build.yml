@@ -1,0 +1,75 @@
+name: Quality checks
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions: write-all
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        python-version: [3.14.x]
+
+    runs-on: ubuntu-latest
+
+    name: Build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: 'uv.lock'
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version-file: 'pyproject.toml'
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Lint
+        run: make lint
+
+      - name: Test
+        run: |
+          make test | tee result.log
+          echo "COVERAGE<<EOF" >> $GITHUB_ENV
+          echo "## Test Results" >> $GITHUB_ENV
+          echo "\`\`\`" >> $GITHUB_ENV
+          cat result.log >> $GITHUB_ENV
+          echo "\`\`\`" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          # Add to summary
+          echo "## Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          cat result.log >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Add comment to PR
+        uses: actions/github-script@v8
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              issue_number: context.issue.number,
+              repo: context.repo.repo,
+              body: process.env.COVERAGE
+            })
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: reports
+          overwrite: true
+        if: ${{ always() }}
