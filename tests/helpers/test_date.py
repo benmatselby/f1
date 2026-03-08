@@ -75,3 +75,57 @@ class TestGetRaceUtc:
         event = pd.Series(dtype=object)
         result = date_helpers.get_race_utc(event)
         assert result is None
+
+
+class TestFormatRaceDatetime:
+    """Tests for format_race_datetime."""
+
+    def test_returns_tbc_when_no_race_session(self):
+        event = pd.Series(
+            {
+                "Session1": "Practice 1",
+                "Session1DateUtc": pd.Timestamp("2026-03-15 11:30:00"),
+            }
+        )
+        assert date_helpers.format_race_datetime(event) == "TBC"
+
+    def test_returns_tbc_when_race_date_is_nat(self):
+        event = pd.Series(
+            {
+                "Session1": "Race",
+                "Session1DateUtc": pd.NaT,
+            }
+        )
+        assert date_helpers.format_race_datetime(event) == "TBC"
+
+    def test_formats_in_local_timezone(self, monkeypatch):
+        monkeypatch.setenv("TZ", "Europe/London")
+        import time
+
+        time.tzset()
+
+        # Winter: UTC+0, no DST
+        event = pd.Series(
+            {
+                "Session1": "Race",
+                "Session1DateUtc": pd.Timestamp("2026-01-18 15:00:00"),
+            }
+        )
+        result = date_helpers.format_race_datetime(event)
+        assert result == "2026-01-18  15:00 GMT"
+
+    def test_formats_with_dst_applied(self, monkeypatch):
+        monkeypatch.setenv("TZ", "Europe/London")
+        import time
+
+        time.tzset()
+
+        # Summer: UTC+1, BST
+        event = pd.Series(
+            {
+                "Session1": "Race",
+                "Session1DateUtc": pd.Timestamp("2026-07-05 14:00:00"),
+            }
+        )
+        result = date_helpers.format_race_datetime(event)
+        assert result == "2026-07-05  15:00 BST"
