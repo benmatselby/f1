@@ -1,12 +1,9 @@
 """Show all races in a given F1 season."""
 
-import sys
 from datetime import datetime, timezone
-from zoneinfo import ZoneInfo
 
 import click
 import fastf1
-from fastf1.events import EventSchedule
 import pandas as pd
 from f1.helpers import helpers
 
