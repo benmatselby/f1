@@ -10,3 +10,7 @@ build/
 # IDE
 .vscode/
 .idea/
+
+# Tools
+.coverage
+reports

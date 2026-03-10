@@ -13,4 +13,18 @@ dependencies = ["click>=8.1", "fastf1>=3.6"]
 f1 = "f1.cli:cli"
 
 [dependency-groups]
-dev = ["pytest>=9.0.2", "ruff>=0.15.5", "pre-commit>=4.5.1"]
+dev = [
+    "pytest>=9.0.2",
+    "ruff>=0.15.5",
+    "pre-commit>=4.5.1",
+    "pytest-cov>=7.0.0",
+]
+
+[tool.coverage.run]
+source = ["f1"]
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.coverage.html]
+directory = "reports/coverage"

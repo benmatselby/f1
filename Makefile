@@ -38,3 +38,7 @@ lint-fix: ## Lint the code with Ruff and fix
 .PHONY: test
 test: ## Run the tests
 	PYTHONPATH=$(PWD) uv run pytest
+
+.PHONY: test-cov
+test-cov: ## Run the tests with coverage report
+	PYTHONPATH=$(PWD) uv run pytest --cov --cov-report=term --cov-report=html
