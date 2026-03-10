@@ -1,11 +1,10 @@
 """Tests for the season command helpers."""
 
-from datetime import datetime, timezone
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
 
-from f1.commands.season import _format_location, _get_pole_sitter, _progress_bar
+from f1.commands.season import _format_location, _get_session_winner, _progress_bar
 
 
 class TestProgressBar:
@@ -84,31 +83,11 @@ class TestFormatLocation:
         assert _format_location(event) == "Melbourne"
 
 
-class TestGetPoleSitter:
-    """Tests for _get_pole_sitter."""
-
-    def test_returns_empty_for_future_race(self):
-        now = datetime(2024, 3, 1, tzinfo=timezone.utc)
-        event = pd.Series(
-            {
-                "RoundNumber": 1,
-                "Session5DateUtc": pd.Timestamp("2024-06-01"),
-                "Session5": "Race",
-            }
-        )
-        assert _get_pole_sitter(now, 2024, event) == ""
+class TestGetSessionWinner:
+    """Tests for _get_session_winner."""
 
     @patch("f1.commands.season.fastf1.get_session")
-    def test_returns_pole_sitter_full_name(self, mock_get_session):
-        now = datetime(2024, 12, 1, tzinfo=timezone.utc)
-        event = pd.Series(
-            {
-                "RoundNumber": 1,
-                "Session5DateUtc": pd.Timestamp("2024-03-01"),
-                "Session5": "Race",
-            }
-        )
-
+    def test_returns_winner_full_name_for_qualifying(self, mock_get_session):
         mock_session = MagicMock()
         mock_session.results = pd.DataFrame(
             {
@@ -119,53 +98,42 @@ class TestGetPoleSitter:
         )
         mock_get_session.return_value = mock_session
 
-        result = _get_pole_sitter(now, 2024, event)
+        result = _get_session_winner(2024, 1, "Q")
         assert result == "Max Verstappen"
         mock_get_session.assert_called_once_with(2024, 1, "Q")
 
     @patch("f1.commands.season.fastf1.get_session")
-    def test_returns_empty_when_results_empty(self, mock_get_session):
-        now = datetime(2024, 12, 1, tzinfo=timezone.utc)
-        event = pd.Series(
+    def test_returns_winner_full_name_for_race(self, mock_get_session):
+        mock_session = MagicMock()
+        mock_session.results = pd.DataFrame(
             {
-                "RoundNumber": 1,
-                "Session5DateUtc": pd.Timestamp("2024-03-01"),
-                "Session5": "Race",
+                "Position": [1.0, 2.0],
+                "FullName": ["Charles Leclerc", "Carlos Sainz"],
+                "Abbreviation": ["LEC", "SAI"],
             }
         )
+        mock_get_session.return_value = mock_session
 
+        result = _get_session_winner(2024, 5, "R")
+        assert result == "Charles Leclerc"
+        mock_get_session.assert_called_once_with(2024, 5, "R")
+
+    @patch("f1.commands.season.fastf1.get_session")
+    def test_returns_empty_when_results_empty(self, mock_get_session):
         mock_session = MagicMock()
         mock_session.results = pd.DataFrame()
         mock_get_session.return_value = mock_session
 
-        assert _get_pole_sitter(now, 2024, event) == ""
+        assert _get_session_winner(2024, 1, "Q") == ""
 
     @patch("f1.commands.season.fastf1.get_session")
     def test_returns_empty_on_exception(self, mock_get_session):
-        now = datetime(2024, 12, 1, tzinfo=timezone.utc)
-        event = pd.Series(
-            {
-                "RoundNumber": 1,
-                "Session5DateUtc": pd.Timestamp("2024-03-01"),
-                "Session5": "Race",
-            }
-        )
-
         mock_get_session.side_effect = Exception("API error")
 
-        assert _get_pole_sitter(now, 2024, event) == ""
+        assert _get_session_winner(2024, 1, "R") == ""
 
     @patch("f1.commands.season.fastf1.get_session")
     def test_returns_abbreviation_when_no_full_name(self, mock_get_session):
-        now = datetime(2024, 12, 1, tzinfo=timezone.utc)
-        event = pd.Series(
-            {
-                "RoundNumber": 1,
-                "Session5DateUtc": pd.Timestamp("2024-03-01"),
-                "Session5": "Race",
-            }
-        )
-
         mock_session = MagicMock()
         mock_session.results = pd.DataFrame(
             {
@@ -176,4 +144,4 @@ class TestGetPoleSitter:
         )
         mock_get_session.return_value = mock_session
 
-        assert _get_pole_sitter(now, 2024, event) == "VER"
+        assert _get_session_winner(2024, 1, "Q") == "VER"

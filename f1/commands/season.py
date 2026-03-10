@@ -63,8 +63,12 @@ def season(year: int, include_testing: bool, show_winners: bool):
                 completed += 1
 
             if show_winners:
-                row.append(_get_pole_sitter(now, year, event))
-                row.append(_get_race_winner(now, year, event))
+                if race_time and race_time >= now:
+                    row.extend(["", ""])
+                else:
+                    rnd = int(event["RoundNumber"])
+                    row.append(_get_session_winner(year, rnd, "Q"))
+                    row.append(_get_session_winner(year, rnd, "R"))
 
             rows.append(tuple(row))
 
@@ -101,14 +105,10 @@ def season(year: int, include_testing: bool, show_winners: bool):
     click.echo(f"Total events: {len(rows)}")
 
 
-def _get_race_winner(now: datetime, year: int, event: pd.Series) -> str:
-    """Return the full name of the race winner, or empty if not yet raced."""
-    race_time = date_helpers.get_race_utc(event)
-    if race_time and race_time >= now:
-        return ""
-
+def _get_session_winner(year: int, round_number: int, session_type: str) -> str:
+    """Return the full name of the P1 finisher for a session, or empty if not available."""
     try:
-        session = fastf1.get_session(year, event["RoundNumber"], "R")
+        session = fastf1.get_session(year, round_number, session_type)
         session.load(laps=False, telemetry=False, weather=False, messages=False)
         results = session.results
         if results.empty:
@@ -119,28 +119,6 @@ def _get_race_winner(now: datetime, year: int, event: pd.Series) -> str:
             return ""
 
         return str(winner.iloc[0]["FullName"] or winner.iloc[0]["Abbreviation"] or "")
-    except Exception:
-        return ""
-
-
-def _get_pole_sitter(now: datetime, year: int, event: pd.Series) -> str:
-    """Return the full name of the pole sitter, or empty if not yet qualified."""
-    race_time = date_helpers.get_race_utc(event)
-    if race_time and race_time >= now:
-        return ""
-
-    try:
-        session = fastf1.get_session(year, event["RoundNumber"], "Q")
-        session.load(laps=False, telemetry=False, weather=False, messages=False)
-        results = session.results
-        if results.empty:
-            return ""
-
-        pole = results[results["Position"] == 1.0]
-        if pole.empty:
-            return ""
-
-        return str(pole.iloc[0]["FullName"] or pole.iloc[0]["Abbreviation"] or "")
     except Exception:
         return ""
 
