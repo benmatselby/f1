@@ -1,6 +1,7 @@
 """F1 CLI - View Formula 1 data powered by Fast-F1."""
 
 import logging
+from importlib.metadata import version
 
 import click
 import fastf1
@@ -12,7 +13,7 @@ fastf1.set_log_level(logging.ERROR)
 
 
 @click.group()
-@click.version_option(version="0.1.0")
+@click.version_option(version=version("f1"))
 def cli():
     """A CLI tool for viewing Formula 1 data."""
 
