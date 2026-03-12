@@ -4,6 +4,12 @@ import pandas as pd
 
 
 def get_race_utc(event: pd.Series) -> datetime | None:
+    """Return the UTC datetime of the race session, or None if unavailable.
+
+    Scans session slots 1-5 looking for one named "Race" and returns its
+    UTC timestamp as a timezone-aware datetime.  Returns None when the
+    event has no race session or the date is not yet confirmed (NaT).
+    """
     for n in range(1, 6):
         if event.get(f"Session{n}") == "Race":
             utc = event.get(f"Session{n}DateUtc")
