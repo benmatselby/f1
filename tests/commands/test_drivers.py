@@ -272,7 +272,7 @@ class TestDriversCommand:
         ergast.get_race_results.return_value = race_results
 
         runner = CliRunner()
-        result = runner.invoke(drivers, ["2024"])
+        result = runner.invoke(drivers, ["2024", "--show-podiums"])
 
         assert result.exit_code == 0
         assert "Pos" in result.output
@@ -295,7 +295,7 @@ class TestDriversCommand:
                     "givenName": ["Max", "Lando"],
                     "familyName": ["Verstappen", "Norris"],
                     "constructorNames": [["Red Bull"], ["McLaren"]],
-                    "wins": [2, 0],
+                    "wins": [1, 0],
                     "points": [100.0, 50.0],
                     "driverId": ["max_verstappen", "norris"],
                 }
@@ -320,22 +320,22 @@ class TestDriversCommand:
             pd.DataFrame(
                 {
                     "position": [1, 2, 3],
-                    "driverId": ["max_verstappen", "leclerc", "norris"],
+                    "driverId": ["hamilton", "leclerc", "norris"],
                 }
             )
         ]
         ergast.get_race_results.side_effect = [round1, round2]
 
         runner = CliRunner()
-        result = runner.invoke(drivers, ["2024"])
+        result = runner.invoke(drivers, ["2024", "--show-podiums"])
 
         assert result.exit_code == 0
-        # Verstappen: 2 podiums, Norris: 2 podiums
         lines = result.output.strip().split("\n")
         verstappen_line = [line for line in lines if "Verstappen" in line][0]
         norris_line = [line for line in lines if "Norris" in line][0]
-        assert "2" in verstappen_line
-        assert "2" in norris_line
+
+        assert "1    Max Verstappen  Red Bull  100  1     1" in verstappen_line
+        assert "2    Lando Norris    McLaren   50   0     2" in norris_line
 
     @patch("f1.commands.drivers.Ergast")
     def test_shows_zero_podiums_for_driver_without_any(self, mock_ergast_cls):
