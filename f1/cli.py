@@ -6,6 +6,7 @@ from importlib.metadata import version
 import click
 import fastf1
 
+from f1.commands.constructors import constructors
 from f1.commands.drivers import drivers
 from f1.commands.race import race
 from f1.commands.season import season
@@ -22,3 +23,4 @@ def cli():
 cli.add_command(drivers)
 cli.add_command(race)
 cli.add_command(season)
+cli.add_command(constructors)

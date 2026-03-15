@@ -30,18 +30,16 @@ def drivers(year: int, show_podiums: bool):
             f"Failed to fetch championship standings for {year}: {e}"
         ) from e
 
-    if not response.content:
+    standings = getattr(response, "content", [])
+    if not standings:
         raise click.ClickException(f"No championship data found for {year}.")
 
-    standings = response.content[0]
-    if standings.empty:
-        raise click.ClickException(f"No championship data found for {year}.")
-
+    podium_counts = {}
     if show_podiums:
         podium_counts = _get_podium_counts(ergast, year)
 
     rows = []
-    for _, driver in standings.iterrows():
+    for _, driver in standings[0].iterrows():
         pos = str(int(driver["position"]))
         name = f"{driver['givenName']} {driver['familyName']}"
         team = ", ".join(driver["constructorNames"])

@@ -46,7 +46,12 @@ def render_table(headers: tuple[str, ...], rows: list[tuple[str, ...]]) -> list[
     lines.append("-" * total_width)
 
     for row in rows:
-        lines.append("".join(f"{val:<{col_widths[i]}}" for i, val in enumerate(row)))
+        lines.append(
+            "".join(
+                f"{val:<{col_widths[i]}}" if i < len(row) - 1 else f"{val}"
+                for i, val in enumerate(row)
+            )
+        )
 
     return lines
 
