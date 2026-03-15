@@ -6,6 +6,8 @@ import click
 import fastf1
 import pandas as pd
 
+from f1.helpers.formatting import fmt_points
+
 
 @click.command()
 @click.argument("year", type=int)
@@ -49,7 +51,7 @@ def race(year: int, venue: str):
         time_str = _fmt_time(driver, is_first)
         status = str(driver["Status"] or "")
         laps = _fmt_int(driver["Laps"])
-        pts = _fmt_points(driver["Points"])
+        pts = fmt_points(driver["Points"])
 
         is_first = False
         rows.append((pos, name, team, grid, time_str, status, laps, pts))
@@ -137,11 +139,3 @@ def _fmt_int(value) -> str:
     if pd.notna(value):
         return str(int(value))
     return "-"
-
-
-def _fmt_points(value) -> str:
-    """Format points, showing integers where possible."""
-    if pd.notna(value):
-        pts = float(value)
-        return str(int(pts)) if pts == int(pts) else str(pts)
-    return "0"
