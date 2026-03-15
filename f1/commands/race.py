@@ -6,7 +6,7 @@ import click
 import fastf1
 import pandas as pd
 
-from f1.helpers.formatting import fmt_points
+from f1.helpers.formatting import print_table, fmt_points
 
 
 @click.command()
@@ -57,23 +57,7 @@ def race(year: int, venue: str):
         rows.append((pos, name, team, grid, time_str, status, laps, pts))
 
     headers = ("Pos", "Driver", "Team", "Grid", "Time/Gap", "Status", "Laps", "Pts")
-    col_widths = []
-    for i, header in enumerate(headers):
-        max_data = max((len(r[i]) for r in rows), default=0)
-        col_widths.append(max(len(header), max_data) + 2)
-
-    # Last column doesn't need trailing padding
-    col_widths[-1] = max(len(headers[-1]), max(len(r[-1]) for r in rows))
-
-    total_width = sum(col_widths)
-    header_line = "".join(f"{h:<{col_widths[i]}}" for i, h in enumerate(headers))
-
-    click.echo(f"\n{event_name}\n")
-    click.echo(header_line)
-    click.echo("-" * total_width)
-
-    for row in rows:
-        click.echo("".join(f"{val:<{col_widths[i]}}" for i, val in enumerate(row)))
+    print_table(event_name, headers, rows)
 
     click.echo(f"\nClassified: {sum(1 for r in rows if r[0].isdigit())}")
 

@@ -5,7 +5,7 @@ from collections import Counter
 import click
 from fastf1.ergast import Ergast
 
-from f1.helpers.formatting import fmt_points
+from f1.helpers.formatting import print_table, fmt_points
 
 
 @click.command()
@@ -46,23 +46,7 @@ def drivers(year: int):
         rows.append((pos, name, team, wins, podiums, points))
 
     headers = ("Pos", "Driver", "Team", "Wins", "Podiums", "Pts")
-    col_widths = []
-    for i, header in enumerate(headers):
-        max_data = max((len(r[i]) for r in rows), default=0)
-        col_widths.append(max(len(header), max_data) + 2)
-
-    # Last column doesn't need trailing padding
-    col_widths[-1] = max(len(headers[-1]), max(len(r[-1]) for r in rows))
-
-    total_width = sum(col_widths)
-    header_line = "".join(f"{h:<{col_widths[i]}}" for i, h in enumerate(headers))
-
-    click.echo(f"\nFormula 1 {year} Driver Championship\n")
-    click.echo(header_line)
-    click.echo("-" * total_width)
-
-    for row in rows:
-        click.echo("".join(f"{val:<{col_widths[i]}}" for i, val in enumerate(row)))
+    print_table(f"Formula 1 {year} Driver Championship", headers, rows)
 
     click.echo(f"\nTotal drivers: {len(rows)}")
 

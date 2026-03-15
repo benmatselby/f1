@@ -5,7 +5,9 @@ from datetime import datetime, timezone
 import click
 import fastf1
 import pandas as pd
+
 from f1.helpers import date as date_helpers
+from f1.helpers.formatting import print_table
 
 
 @click.command()
@@ -72,34 +74,11 @@ def season(year: int, include_testing: bool, show_winners: bool):
 
             rows.append(tuple(row))
 
-    columns = [
-        ("Rnd", 0),
-        ("Event", 1),
-        ("Location", 2),
-        ("Date & Time", 3),
-    ]
+    headers = ("Rnd", "Event", "Location", "Date & Time")
     if show_winners:
-        columns.append(("Pole Sitter", 4))
-        columns.append(("Winner", 5))
+        headers = (*headers, "Pole Sitter", "Winner")
 
-    col_widths = [
-        max(len(header), max(len(str(row[idx])) for row in rows)) + 2
-        for header, idx in columns
-    ]
-    total = sum(col_widths)
-
-    click.echo(f"\nFormula 1 {year} Season\n")
-    header_row = "".join(
-        f"{header:<{width}}" for (header, _), width in zip(columns, col_widths)
-    )
-    click.echo(header_row)
-    click.echo("-" * total)
-
-    for race in rows:
-        row_str = "".join(
-            f"{str(race[idx]):<{width}}" for (_, idx), width in zip(columns, col_widths)
-        )
-        click.echo(row_str)
+    print_table(f"Formula 1 {year} Season", headers, rows)
 
     click.echo(f"\nProgress    : {_progress_bar(completed, len(rows))}")
     click.echo(f"Total events: {len(rows)}")
