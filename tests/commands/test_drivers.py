@@ -1,11 +1,14 @@
 """Tests for the drivers command."""
 
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock
+from unittest.mock import call
+from unittest.mock import patch
 
 import pandas as pd
 from click.testing import CliRunner
 
-from f1.commands.drivers import _get_podium_counts, drivers
+from f1.commands.drivers import _get_podium_counts
+from f1.commands.drivers import drivers
 
 
 class TestGetPodiumCounts:

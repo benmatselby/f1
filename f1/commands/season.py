@@ -1,6 +1,7 @@
 """Show all races in a given F1 season."""
 
-from datetime import datetime, timezone
+from datetime import UTC
+from datetime import datetime
 
 import click
 import fastf1
@@ -28,11 +29,11 @@ def season(year: int, include_testing: bool, show_winners: bool):
 
     YEAR is the championship year (e.g. 2024).
     """
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     try:
         schedule = fastf1.get_event_schedule(year, include_testing=include_testing)
     except Exception as e:
-        raise click.ClickException(f"Failed to fetch schedule for {year}: {e}")
+        raise click.ClickException(f"Failed to fetch schedule for {year}: {e}") from e
 
     if schedule.empty:
         raise click.ClickException(f"No events found for {year}.")

@@ -28,3 +28,25 @@ show_missing = true
 
 [tool.coverage.html]
 directory = "reports/coverage"
+
+[tool.ruff.lint.isort]
+force-single-line = true
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 120
+
+[tool.ruff.lint]
+select = [
+  # pycodestyle
+  "E",
+  # Pyflakes
+  "F",
+  # pyupgrade
+  "UP",
+  # flake8-bugbear
+  "B",
+  # flake8-simplify
+  "SIM",
+  # isort
+  "I",
+]

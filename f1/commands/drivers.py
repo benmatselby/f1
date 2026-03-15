@@ -5,7 +5,8 @@ from collections import Counter
 import click
 from fastf1.ergast import Ergast
 
-from f1.helpers.formatting import print_table, fmt_points
+from f1.helpers.formatting import fmt_points
+from f1.helpers.formatting import print_table
 
 
 @click.command()
@@ -24,7 +25,7 @@ def drivers(year: int):
     except Exception as e:
         raise click.ClickException(
             f"Failed to fetch championship standings for {year}: {e}"
-        )
+        ) from e
 
     if not response.content:
         raise click.ClickException(f"No championship data found for {year}.")

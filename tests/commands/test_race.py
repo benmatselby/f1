@@ -1,12 +1,17 @@
 """Tests for the race command."""
 
 from datetime import timedelta
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import pandas as pd
 from click.testing import CliRunner
 
-from f1.commands.race import _fmt_grid, _fmt_int, _fmt_position, _fmt_time, race
+from f1.commands.race import _fmt_grid
+from f1.commands.race import _fmt_int
+from f1.commands.race import _fmt_position
+from f1.commands.race import _fmt_time
+from f1.commands.race import race
 
 
 class TestFmtPosition:

@@ -1,6 +1,7 @@
 """Date utilities for F1 events."""
 
-from datetime import datetime, timezone
+from datetime import UTC
+from datetime import datetime
 
 import pandas as pd
 
@@ -17,7 +18,7 @@ def get_race_utc(event: pd.Series) -> datetime | None:
             utc = event.get(f"Session{n}DateUtc")
 
             if pd.notna(utc):
-                return utc.to_pydatetime().replace(tzinfo=timezone.utc)
+                return utc.to_pydatetime().replace(tzinfo=UTC)
 
             return None
 

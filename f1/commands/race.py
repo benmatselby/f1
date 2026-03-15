@@ -6,7 +6,8 @@ import click
 import fastf1
 import pandas as pd
 
-from f1.helpers.formatting import print_table, fmt_points
+from f1.helpers.formatting import fmt_points
+from f1.helpers.formatting import print_table
 
 
 @click.command()
@@ -27,7 +28,7 @@ def race(year: int, venue: str):
         session = fastf1.get_session(year, venue, "R")
         session.load(laps=False, telemetry=False, weather=False, messages=False)
     except Exception as e:
-        raise click.ClickException(f"Failed to load race data: {e}")
+        raise click.ClickException(f"Failed to load race data: {e}") from e
 
     results = session.results
     if results.empty:

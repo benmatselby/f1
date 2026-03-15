@@ -1,10 +1,13 @@
 """Tests for the season command helpers."""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import pandas as pd
 
-from f1.commands.season import _format_location, _get_session_winner, _progress_bar
+from f1.commands.season import _format_location
+from f1.commands.season import _get_session_winner
+from f1.commands.season import _progress_bar
 
 
 class TestProgressBar:

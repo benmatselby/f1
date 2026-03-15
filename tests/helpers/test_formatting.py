@@ -1,10 +1,11 @@
 """Tests for the formatting helpers module."""
 
+import click
 from click.testing import CliRunner
 
-import click
-
-from f1.helpers.formatting import print_table, fmt_points, render_table
+from f1.helpers.formatting import fmt_points
+from f1.helpers.formatting import print_table
+from f1.helpers.formatting import render_table
 
 
 class TestFmtPoints:

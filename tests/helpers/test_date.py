@@ -1,6 +1,7 @@
 """Tests for the helpers module."""
 
-from datetime import datetime, timezone
+from datetime import UTC
+from datetime import datetime
 
 import pandas as pd
 
@@ -26,7 +27,7 @@ class TestGetRaceUtc:
             }
         )
         result = date_helpers.get_race_utc(event)
-        assert result == datetime(2026, 3, 17, 15, 0, 0, tzinfo=timezone.utc)
+        assert result == datetime(2026, 3, 17, 15, 0, 0, tzinfo=UTC)
 
     def test_returns_timezone_aware_datetime(self):
         event = pd.Series(
@@ -37,7 +38,7 @@ class TestGetRaceUtc:
         )
         result = date_helpers.get_race_utc(event)
         assert result is not None
-        assert result.tzinfo == timezone.utc
+        assert result.tzinfo == UTC
 
     def test_returns_none_when_no_race_session(self):
         event = pd.Series(
