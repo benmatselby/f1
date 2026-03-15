@@ -1,3 +1,5 @@
+"""Date utilities for F1 events."""
+
 from datetime import datetime, timezone
 
 import pandas as pd

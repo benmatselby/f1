@@ -122,4 +122,5 @@ def _fmt_int(value) -> str:
     """Format a numeric value as an integer string."""
     if pd.notna(value):
         return str(int(value))
+
     return "-"
