@@ -2,6 +2,9 @@
 
 A CLI tool for viewing Formula 1 season schedules, powered by [Fast-F1](https://github.com/theOehrly/Fast-F1).
 
+>!> [!NOTE]
+> This application has been vibe engineered. So whilst AI has built this, I have been "somewhat" considerate to the code being produced.
+
 ## Requirements
 
 - Python 3.10+
