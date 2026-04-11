@@ -5,6 +5,8 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
+    cooldown:
+      default-days: 3
     commit-message:
       prefix: 'build(deps)'
 
@@ -13,6 +15,8 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
+    cooldown:
+      default-days: 3
     commit-message:
       prefix: 'build(deps)'
     groups:
@@ -20,4 +24,3 @@ updates:
         dependency-type: "production"
       development-dependencies:
         dependency-type: "development"
-

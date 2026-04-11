@@ -20,9 +20,6 @@ dev = [
   "pytest-cov>=7.0.0",
 ]
 
-[tool.uv]
-exclude-newer = "1 week"
-
 [tool.setuptools]
 packages = ["f1"] # Only include the f1 directory
 
