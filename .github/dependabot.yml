@@ -6,7 +6,7 @@ updates:
     schedule:
       interval: 'weekly'
     commit-message:
-      prefix: 'GHA'
+      prefix: 'build(deps)'
 
   # Maintain dependencies for Python
   - package-ecosystem: 'uv'
@@ -14,7 +14,7 @@ updates:
     schedule:
       interval: 'weekly'
     commit-message:
-      prefix: 'uv'
+      prefix: 'build(deps)'
     groups:
       production-dependencies:
         dependency-type: "production"
