@@ -15,8 +15,8 @@ f1 = "f1.cli:cli"
 [dependency-groups]
 dev = [
   "pytest>=9.0.2",
-  "ruff>=0.15.5",
-  "pre-commit>=4.5.1",
+  "ruff>=0.15.12",
+  "pre-commit>=4.6.0",
   "pytest-cov>=7.0.0",
 ]
 
