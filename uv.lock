@@ -309,7 +309,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.3.3" },
-    { name = "fastf1", specifier = ">=3.6" },
+    { name = "fastf1", specifier = ">=3.8.3" },
 ]
 
 [package.metadata.requires-dev]
@@ -322,7 +322,7 @@ dev = [
 
 [[package]]
 name = "fastf1"
-version = "3.8.2"
+version = "3.8.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cryptography" },
@@ -341,9 +341,9 @@ dependencies = [
     { name = "timple" },
     { name = "websockets" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ae/22/3c672e7c659f759316f12d5e2241440e8db887bb1a3569896b418b68fe43/fastf1-3.8.2.tar.gz", hash = "sha256:e580c19c485c124e27166c40c60be7ce6ab451b9f8b5a98de1a35ff3b48d6f14", size = 135404, upload-time = "2026-03-29T16:41:56.884Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f9/8f/3281f9add386bcd7f20f2f487917d5dc2422ec32581b22ec42a5a5c8a670/fastf1-3.8.3.tar.gz", hash = "sha256:9277e1a759debfcf63e65c248b9d440c561724147512fd5e95115dd8a71ac350", size = 137053, upload-time = "2026-04-29T21:24:04.164Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a0/e7/cf94d3fd6971a210ca81c7bf84c10b32afdbe42b4db951f742732bd8a2ba/fastf1-3.8.2-py3-none-any.whl", hash = "sha256:427046fcad037448d153f89e41c731642ee9e607f90179aaf5e6eda339f38d2a", size = 135403, upload-time = "2026-03-29T16:41:55.759Z" },
+    { url = "https://files.pythonhosted.org/packages/0e/7b/fd211595db7d433c7180184559e5c1aad5621a964fc1c8724218fa3690d5/fastf1-3.8.3-py3-none-any.whl", hash = "sha256:e3270f6d60838662dd3e15cf6236519228a7fcfcc009f5edb195798769c845ad", size = 135960, upload-time = "2026-04-29T21:24:01.912Z" },
 ]
 
 [[package]]
