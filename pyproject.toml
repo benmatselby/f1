@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=83.0.0", "setuptools-scm>=10.2.0"]
+requires = ["setuptools>=83.0.0", "setuptools-scm>=10.2.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -15,7 +15,7 @@ f1 = "f1.cli:cli"
 [dependency-groups]
 dev = [
   "pytest>=9.1.1",
-  "ruff>=0.15.21",
+  "ruff>=0.15.22",
   "pre-commit>=4.6.0",
   "pytest-cov>=7.0.0",
 ]
