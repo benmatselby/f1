@@ -6,19 +6,14 @@ build-backend = "setuptools.build_meta"
 name = "f1"
 version = "0.2.0"
 description = "A CLI tool for viewing Formula 1 season schedules"
-requires-python = ">=3.14"
+requires-python = ">=3.14,<3.15"
 dependencies = ["click>=8.5.0", "fastf1>=3.8.3"]
 
 [project.scripts]
 f1 = "f1.cli:cli"
 
 [dependency-groups]
-dev = [
-  "pytest>=9.1.1",
-  "ruff>=0.17.1",
-  "pre-commit>=4.7.0",
-  "pytest-cov>=7.0.0",
-]
+dev = ["pytest>=9.1.1", "ruff>=0.17.1", "pre-commit>=4.7.0", "pytest-cov>=7.0.0"]
 
 [tool.setuptools]
 packages = ["f1"] # Only include the f1 directory
